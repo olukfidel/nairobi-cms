@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js"
   },
-  "author": "Gemini AI",
+  "author": "Fidel Oluk",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
