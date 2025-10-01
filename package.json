@@ -1,0 +1,18 @@
+{
+  "name": "nairobi-complaint-system",
+  "version": "1.0.0",
+  "description": "A self-contained Complaint Management System for Nairobi County.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Gemini AI",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.19.2",
+    "express-fileupload": "^1.5.0",
+    "express-session": "^1.18.0",
+    "sqlite3": "^5.1.7"
+  }
+}

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nairobi County Complaint Management System</title>
+    <style>
+        /* Import Google Font 'Inter' */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+        /* CSS Variables for a consistent color scheme */
+        :root {
+            --primary-color: #4CAF50; /* Vibrant Green */
+            --accent-color: #FFC107; /* Warm Yellow */
+            --dark-text: #212121;
+            --light-text: #FAFAFA;
+            --background-color: #F5F5F5;
+            --container-bg: #FFFFFF;
+            --border-color: #E0E0E0;
+            --error-color: #D32F2F;
+            --success-color: #388E3C;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* General Body and Reset Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        /* Main Container for all views */
+        main {
+            max-width: 1200px;
+            margin: 80px auto 20px; /* Adjust margin-top to account for fixed navbar */
+            padding: 20px;
+        }
+
+        /* Hide all views by default */
+        .view {
+            display: none;
+        }
+
+        /* Navigation Bar */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--container-bg);
+            box-shadow: var(--box-shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            color: var(--primary-color);
+        }
+
+        /* Responsive Navigation for Mobile */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            nav ul {
+                margin-top: 1rem;
+            }
+            main {
+                margin-top: 150px;
+            }
+        }
+
+        /* Section and Card Styling */
+        .card {
+            background-color: var(--container-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            color: var(--dark-text);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+        
+        h2 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        /* Form elements styling */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Button Styling */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .btn-accent {
+             background-color: var(--accent-color);
+             color: var(--dark-text);
+        }
+        
+        .btn-accent:hover {
+            background-color: #ffb300;
+            transform: translateY(-2px);
+        }
+        
+        /* Message/Alert Styling */
+        .message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        
+        .message.error {
+            background-color: var(--error-color);
+            color: var(--light-text);
+        }
+        
+        .message.success {
+            background-color: var(--success-color);
+            color: var(--light-text);
+        }
+
+        /* Home Page specific styles */
+        #home-view .hero {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+
+        /* Complaint List Styling (for both dashboards) */
+        .complaint-list {
+            margin-top: 2rem;
+        }
+        
+        .complaint-card {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .complaint-card p { margin-bottom: 0.5rem; }
+        .complaint-card .meta {
+            font-size: 0.9rem;
+            color: #616161;
+            display: flex;
+            justify-content: space-between;
+        }
+        .complaint-card .status {
+            font-weight: bold;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .status-Submitted { background-color: #ffcdd2; color: #c62828; }
+        .status-In-Progress { background-color: #fff9c4; color: #f57f17; }
+        .status-Resolved { background-color: #c8e6c9; color: #2e7d32; }
+
+        .complaint-images a {
+            margin-right: 10px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .complaint-images a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* Admin Dashboard Table */
+        .table-container {
+            overflow-x: auto; /* For responsiveness */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Nairobi CMS</div>
+        <ul>
+            <li><a href="#" class="nav-link" data-view="home-view">Home</a></li>
+            <li><a href="#" class="nav-link" data-view="about-view">About Us</a></li>
+            <li><a href="#" class="nav-link" data-view="contact-view">Contact</a></li>
+            <li id="auth-links">
+                <a href="#" class="nav-link" data-view="login-register-view">Login / Register</a>
+            </li>
+            <li id="dashboard-link" style="display: none;">
+                <a href="#" class="nav-link" data-view="">Dashboard</a>
+            </li>
+            <li id="logout-link" style="display: none;">
+                <a href="#" id="logout-btn">Logout</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="home-view" class="view card hero">
+            <h1>Welcome to the Nairobi County Complaint Portal</h1>
+            <p>Your voice matters. Report issues in your community and help us make Nairobi a better place.</p>
+            <button class="btn btn-primary" id="file-complaint-cta">File a Complaint</button>
+        </section>
+
+        <section id="about-view" class="view card">
+            <h2>About This Initiative</h2>
+            <p>The Nairobi County Complaint Management System is a digital platform designed to empower citizens by providing a direct and efficient channel to report non-emergency issues to the county government. From potholes and waste management problems to public lighting and water leakages, this system ensures that your concerns are heard, tracked, and addressed in a timely manner.</p>
+            <p>Our goal is to enhance transparency, accountability, and citizen participation in the governance and development of our great county.</p>
+        </section>
+
+        <section id="contact-view" class="view card">
+            <h2>Contact Us</h2>
+            <p>For any inquiries or support, please reach out to us through the following channels:</p>
+            <ul>
+                <li><strong>Hotline:</strong> +254 700 123 456</li>
+                <li><strong>Email:</strong> contact@nairobi.go.ke</li>
+                <li><strong>Physical Address:</strong> City Hall, Nairobi, Kenya</li>
+            </ul>
+        </section>
+
+        <section id="login-register-view" class="view card">
+            <div id="auth-message"></div>
+            <form id="login-form">
+                <h2>Login</h2>
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <hr style="margin: 2rem 0;">
+            <form id="register-form">
+                <h2>Register</h2>
+                 <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <button type="submit" class="btn btn-accent">Register</button>
+            </form>
+        </section>
+
+        <section id="citizen-dashboard-view" class="view">
+            <h2 id="citizen-welcome">Welcome, Citizen!</h2>
+            <div class="card">
+                <h3>File a New Complaint</h3>
+                <div id="complaint-form-message"></div>
+                <form id="complaint-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="complaint-description">Describe your issue in detail:</label>
+                        <textarea id="complaint-description" rows="5" required></textarea>
+                    </div>
+                     <div class="form-group">
+                        <label for="complaint-image">Upload an Image (Optional)</label>
+                        <input type="file" id="complaint-image" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Complaint</button>
+                </form>
+            </div>
+            
+            <div class="complaint-list card">
+                <h3>My Past Complaints</h3>
+                <div id="my-complaints-list">
+                    </div>
+            </div>
+        </section>
+
+        <section id="admin-dashboard-view" class="view card">
+            <h2>All Submitted Complaints</h2>
+            <div id="admin-message"></div>
+            <div class="table-container">
+                <table id="all-complaints-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User Email</th>
+                            <th>Description</th>
+                            <th>Image(s)</th>
+                            <th>Submitted At</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- STATE MANAGEMENT ---
+            let currentUser = null;
+
+            // --- DOM SELECTORS ---
+            const views = document.querySelectorAll('.view');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const authLinks = document.getElementById('auth-links');
+            const dashboardLinkContainer = document.getElementById('dashboard-link');
+            const dashboardLink = dashboardLinkContainer.querySelector('a');
+            const logoutLinkContainer = document.getElementById('logout-link');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const complaintForm = document.getElementById('complaint-form');
+            const fileComplaintCta = document.getElementById('file-complaint-cta');
+            
+            const authMessage = document.getElementById('auth-message');
+            const complaintFormMessage = document.getElementById('complaint-form-message');
+            const adminMessage = document.getElementById('admin-message');
+            const myComplaintsList = document.getElementById('my-complaints-list');
+            const allComplaintsTableBody = document.querySelector('#all-complaints-table tbody');
+
+            // --- SPA NAVIGATION LOGIC ---
+            const showView = (viewId) => {
+                views.forEach(view => view.style.display = 'none');
+                const activeView = document.getElementById(viewId);
+                if (activeView) {
+                    activeView.style.display = 'block';
+                }
+                // Update active link style
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if(link.dataset.view === viewId) {
+                        link.classList.add('active');
+                    }
+                });
+            };
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const viewId = e.target.dataset.view;
+                    if (viewId) {
+                        showView(viewId);
+                    }
+                });
+            });
+            
+            // CTA button navigation
+            fileComplaintCta.addEventListener('click', () => {
+                if (currentUser) {
+                    showView(currentUser.role === 'admin' ? 'admin-dashboard-view' : 'citizen-dashboard-view');
+                } else {
+                    showView('login-register-view');
+                }
+            });
+
+            // --- UI UPDATE FUNCTIONS ---
+            const updateUIForUser = () => {
+                if (currentUser) {
+                    authLinks.style.display = 'none';
+                    dashboardLinkContainer.style.display = 'block';
+                    logoutLinkContainer.style.display = 'block';
+
+                    if (currentUser.role === 'admin') {
+                        dashboardLink.dataset.view = 'admin-dashboard-view';
+                        document.getElementById('admin-dashboard-view').querySelector('h2').textContent = `Admin Dashboard | Welcome, ${currentUser.email}`;
+                        showView('admin-dashboard-view');
+                        fetchAllComplaints();
+                    } else {
+                        dashboardLink.dataset.view = 'citizen-dashboard-view';
+                        document.getElementById('citizen-welcome').textContent = `Welcome, ${currentUser.email}`;
+                        showView('citizen-dashboard-view');
+                        fetchMyComplaints();
+                    }
+                } else {
+                    authLinks.style.display = 'block';
+                    dashboardLinkContainer.style.display = 'none';
+                    logoutLinkContainer.style.display = 'none';
+                    showView('home-view');
+                }
+            };
+            
+            const displayMessage = (element, message, type = 'error') => {
+                element.innerHTML = `<div class="message ${type}">${message}</div>`;
+                setTimeout(() => element.innerHTML = '', 4000);
+            };
+
+            // --- API INTERACTION FUNCTIONS ---
+
+            // Check session on initial load
+            const checkSession = async () => {
+                try {
+                    const response = await fetch('/api/session');
+                    const data = await response.json();
+                    if (data.loggedIn) {
+                        currentUser = data.user;
+                    } else {
+                        currentUser = null;
+                    }
+                } catch (error) {
+                    console.error('Session check failed:', error);
+                    currentUser = null;
+                }
+                updateUIForUser();
+            };
+
+            // Handle Registration
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+
+                try {
+                    const response = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        displayMessage(authMessage, 'Registration successful! Please log in.', 'success');
+                        registerForm.reset();
+                    } else {
+                        displayMessage(authMessage, data.message || 'Registration failed.');
+                    }
+                } catch (error) {
+                    displayMessage(authMessage, 'An error occurred. Please try again.');
+                }
+            });
+
+            // Handle Login
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                 try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        currentUser = data.user;
+                        updateUIForUser();
+                    } else {
+                        displayMessage(authMessage, data.message || 'Login failed.');
+                    }
+                } catch (error) {
+                    displayMessage(authMessage, 'An error occurred. Please try again.');
+                }
+            });
+
+            // Handle Logout
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                    currentUser = null;
+                    updateUIForUser();
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                }
+            });
+
+            // Handle new complaint submission
+            complaintForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const description = document.getElementById('complaint-description').value;
+                const imageFile = document.getElementById('complaint-image').files[0];
+
+                const formData = new FormData();
+                formData.append('description', description);
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                }
+
+                try {
+                    const response = await fetch('/api/complaints', {
+                        method: 'POST',
+                        body: formData // No Content-Type header needed, browser sets it for FormData
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        displayMessage(complaintFormMessage, data.message, 'success');
+                        complaintForm.reset();
+                        fetchMyComplaints(); // Refresh the list
+                    } else {
+                        displayMessage(complaintFormMessage, data.message);
+                    }
+                } catch (error) {
+                    displayMessage(complaintFormMessage, 'An error occurred submitting your complaint.');
+                }
+            });
+
+            // Fetch citizen's own complaints
+            const fetchMyComplaints = async () => {
+                try {
+                    const response = await fetch('/api/complaints/my-complaints');
+                    if (!response.ok) throw new Error('Failed to fetch');
+                    const complaints = await response.json();
+                    renderMyComplaints(complaints);
+                } catch (error) {
+                    myComplaintsList.innerHTML = '<p>Could not load your complaints.</p>';
+                }
+            };
+
+            // Fetch all complaints (for admin)
+            const fetchAllComplaints = async () => {
+                try {
+                    const response = await fetch('/api/complaints/all');
+                    if (!response.ok) throw new Error('Failed to fetch');
+                    const complaints = await response.json();
+                    renderAllComplaints(complaints);
+                } catch (error) {
+                    allComplaintsTableBody.innerHTML = '<tr><td colspan="6">Could not load complaints.</td></tr>';
+                }
+            };
+            
+            // Update a complaint's status (for admin)
+            const updateComplaintStatus = async (complaintId, newStatus) => {
+                try {
+                    const response = await fetch(`/api/complaints/${complaintId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        displayMessage(adminMessage, data.message, 'success');
+                    } else {
+                        displayMessage(adminMessage, data.message, 'error');
+                    }
+                } catch (error) {
+                    displayMessage(adminMessage, 'Failed to update status.', 'error');
+                }
+            };
+            
+            // --- RENDER FUNCTIONS ---
+            
+            const renderMyComplaints = (complaints) => {
+                if (complaints.length === 0) {
+                    myComplaintsList.innerHTML = '<p>You have not submitted any complaints yet.</p>';
+                    return;
+                }
+                myComplaintsList.innerHTML = complaints.map(c => `
+                    <div class="complaint-card">
+                        <p>${c.description}</p>
+                        ${c.images ? `<div class="complaint-images">${c.images.split(',').map(img => `<a href="${img}" target="_blank">View Image</a>`).join('')}</div>` : ''}
+                        <div class="meta">
+                            <span>Submitted: ${new Date(c.submitted_at).toLocaleString()}</span>
+                            <span class="status status-${c.status.replace(' ', '-')}">${c.status}</span>
+                        </div>
+                    </div>
+                `).join('');
+            };
+            
+            const renderAllComplaints = (complaints) => {
+                if (complaints.length === 0) {
+                    allComplaintsTableBody.innerHTML = '<tr><td colspan="6">No complaints found.</td></tr>';
+                    return;
+                }
+                allComplaintsTableBody.innerHTML = complaints.map(c => `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td>${c.user_email}</td>
+                        <td>${c.description}</td>
+                        <td>${c.images ? c.images.split(',').map(img => `<a href="${img}" target="_blank">Link</a>`).join(' ') : 'None'}</td>
+                        <td>${new Date(c.submitted_at).toLocaleString()}</td>
+                        <td>
+                            <select class="form-group" data-id="${c.id}" onchange="handleStatusChange(this)">
+                                <option value="Submitted" ${c.status === 'Submitted' ? 'selected' : ''}>Submitted</option>
+                                <option value="In Progress" ${c.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="Resolved" ${c.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+                            </select>
+                        </td>
+                    </tr>
+                `).join('');
+            };
+
+            // Make the status change handler globally accessible from the inline onchange event
+            window.handleStatusChange = (selectElement) => {
+                const complaintId = selectElement.dataset.id;
+                const newStatus = selectElement.value;
+                updateComplaintStatus(complaintId, newStatus);
+            };
+
+            // --- INITIALIZATION ---
+            checkSession();
+
+        });
+    </script>
+</body>
+</html>
