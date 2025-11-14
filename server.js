@@ -30,8 +30,9 @@ app.use(session({
 // File upload handling
 app.use(fileUpload());
 
-// Create 'uploads' directory if it doesn't exist
-const uploadsDir = path.join(__dirname, 'uploads');
+// --- CORRECTION ---
+// Create 'uploads' directory on the persistent disk if it doesn't exist
+const uploadsDir = path.join('/data', 'uploads');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir);
 }
@@ -160,6 +161,8 @@ app.post('/api/complaints', requireLogin, (req, res) => {
         if (req.files && req.files.image) {
             const imageFile = req.files.image;
             const uniqueFilename = `${Date.now()}-${imageFile.name}`;
+            
+            // This path now correctly uses the /data/uploads directory
             const uploadPath = path.join(uploadsDir, uniqueFilename);
 
             imageFile.mv(uploadPath, (err) => {

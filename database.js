@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt');
 const DB_SOURCE = 'nairobi_complaints.db';
 
 // Initialize the database connection
-const db = new sqlite3.Database(DB_SOURCE, (err) => {
+const db = new sqlite3.Database('/data/nairobi_complaints.db', (err) => {
     if (err) {
         // Cannot open database
         console.error(err.message);
